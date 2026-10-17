@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse — Social Media Platform</title>
+  <meta name="description" content="Mini social media app with profiles, posts, comments, and like/follow system." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-container">
+      <!-- Zone 1: Brand Wordmark -->
+      <button class="brand" id="brandBtn">
+        <div class="brand-icon">P</div>
+        <span>Pulse</span>
+      </button>
+
+      <!-- Zone 2: Navigation Links -->
+      <nav class="nav-links">
+        <button class="nav-btn active" id="navFeedBtn">Feed</button>
+        <button class="nav-btn" id="navExploreBtn">Explore & Topics</button>
+        <button class="nav-btn" id="navProfileBtn">My Profile</button>
+      </nav>
+
+      <!-- Zone 3: Actions & Persona Switcher -->
+      <div class="topbar-actions">
+        <a href="pulse-frontend.zip" download="pulse-frontend.zip" class="btn-download" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; padding:8px 12px; font-weight:600; border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); background:var(--bg-card); cursor:pointer;" title="Download Frontend ZIP (HTML, CSS, JS, Images)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download ZIP</span>
+        </a>
+        <div class="persona-select-wrapper">
+          <span style="color: var(--text-subtle); font-family: var(--font-mono);">as:</span>
+          <select class="persona-select" id="personaSelect">
+            <!-- Populated via script.js -->
+          </select>
+        </div>
+        <button class="btn-primary" id="openCreatePostBtn">+ New Post</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3-Column Layout Container -->
+  <main class="app-layout">
+    
+    <!-- Left Column: User Card & Navigation -->
+    <aside class="sidebar-left">
+      <!-- Profile Card -->
+      <div class="card" id="leftUserCard">
+        <div class="user-profile-badge">
+          <img src="" alt="" class="avatar-img" id="leftUserAvatar" />
+          <div class="user-names">
+            <h3 class="user-display-name" id="leftUserName">Loading...</h3>
+            <p class="user-handle" id="leftUserHandle">@handle</p>
+          </div>
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;" id="leftUserBio"></p>
+        <div class="stats-row">
+          <div style="cursor: pointer;" id="leftFollowingTrigger">
+            <span class="stat-num" id="leftFollowingCount">0</span>
+            <span class="stat-label">Following</span>
+          </div>
+          <span style="color: var(--border-hover);">·</span>
+          <div style="cursor: pointer;" id="leftFollowersTrigger">
+            <span class="stat-num" id="leftFollowersCount">0</span>
+            <span class="stat-label">Followers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed Nav Links -->
+      <div class="card" style="padding: 8px;">
+        <div class="side-nav">
+          <button class="side-nav-btn active" id="sideNavAllBtn">
+            <span>Discover Feed</span>
+            <span style="font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.7;">All</span>
+          </button>
+          <button class="side-nav-btn" id="sideNavFollowingBtn">
+            <span>Following Feed</span>
+            <span style="font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.7;" id="sideFollowingBadge">0</span>
+          </button>
+          <button class="side-nav-btn" id="sideNavExploreBtn">
+            <span>Explore Topics</span>
+          </button>
+          <button class="side-nav-btn" id="sideNavProfileBtn">
+            <span>My Profile</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Testing Persona Switcher Card -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Switch Account</span>
+          <span style="font-size: 0.65rem; color: var(--text-subtle);">Multi-User</span>
+        </div>
+        <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 10px;">
+          Switch perspectives to test following, likes, and comment threads between users:
+        </p>
+        <div id="personaList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        <button class="btn-secondary" id="openNewUserModalBtn" style="width: 100%; justify-content: center; margin-top: 10px;">
+          + Create New Account
+        </button>
+      </div>
+
+      <!-- Backend & Database Status Card -->
+      <div class="card" style="background: var(--surface-alt); font-size: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-weight: 700;">Backend & Database</span>
+          <span style="font-family: var(--font-mono); font-size: 0.65rem; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">Express.js</span>
+        </div>
+        <p style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
+          Users, posts, comments, and follower graph powered by Express REST API and persistent database.
+        </p>
+        <button class="btn-secondary" id="openDbModalBtn" style="width: 100%; justify-content: center; font-size: 0.7rem; padding: 5px 10px;">
+          View Database & REST API →
+        </button>
+      </div>
+    </aside>
+
+    <!-- Center Column: Main Content / Feed or Profile -->
+    <section class="main-feed-area">
+      
+      <!-- Feed Controls (For Feed View) -->
+      <div id="feedControlsSection" style="display: flex; flex-direction: column; gap: 14px;">
+        <!-- Global vs Following Tabs -->
+        <div class="feed-tabs-bar">
+          <button class="feed-tab-btn active" id="tabGlobalBtn">For You (Global Feed)</button>
+          <button class="feed-tab-btn" id="tabFollowingBtn">Following Feed</button>
+        </div>
+
+        <!-- Active Filter Indicator (if filtered) -->
+        <div id="activeFilterBar" style="display: none; justify-content: space-between; align-items: center; background: var(--accent); color: #fff; padding: 10px 14px; border-radius: var(--radius-md); font-size: 0.75rem;">
+          <span id="activeFilterLabel">Filtering by tag</span>
+          <button id="clearFilterBtn" style="background: none; border: none; color: #cbd5e1; text-decoration: underline; cursor: pointer; font-size: 0.75rem;">Clear</button>
+        </div>
+
+        <!-- Quick Post Trigger Box -->
+        <div class="quick-composer-card">
+          <img src="" alt="" class="avatar-img-sm" id="composerAvatar" />
+          <div class="quick-composer-input" id="composerTrigger">
+            What's on your mind? Share thoughts, links, or photography...
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed Posts Stream Container -->
+      <div id="postsStream" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Dynamic posts rendered here -->
+      </div>
+
+      <!-- Profile View Container (Hidden when on Feed) -->
+      <div id="profileViewContainer" style="display: none;">
+        <!-- Dynamic profile rendered here -->
+      </div>
+
+      <!-- Explore View Container (Hidden when on Feed) -->
+      <div id="exploreViewContainer" style="display: none;" class="card">
+        <h2 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">Explore Topics & Communities</h2>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">
+          Browse discussions grouped by topics and visual media.
+        </p>
+        <div id="exploreTopicGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;"></div>
+      </div>
+
+    </section>
+
+    <!-- Right Column: Search, Who to Follow, Trending -->
+    <aside class="sidebar-right">
+      <!-- Search Box -->
+      <div>
+        <input type="text" id="searchInput" class="search-input-box" placeholder="Search posts or hashtags..." />
+      </div>
+
+      <!-- Who to Follow -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 style="font-size: 0.875rem; font-weight: 700;">Who to follow</h3>
+          <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-subtle);">Suggested</span>
+        </div>
+        <div id="whoToFollowList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+
+      <!-- Trending Hashtags -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 style="font-size: 0.875rem; font-weight: 700;">Trending Topics</h3>
+          <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-subtle);">Live</span>
+        </div>
+        <div id="trendingTopicsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Create Post Modal -->
+  <div class="modal-overlay" id="createPostModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 0.875rem; font-weight: 700;">Create New Post</h3>
+        <button id="closeCreatePostModal" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-subtle);">&times;</button>
+      </div>
+      <form id="createPostForm">
+        <div class="modal-body">
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <img src="" id="modalComposerAvatar" class="avatar-img-sm" />
+            <textarea id="postContentInput" rows="4" class="form-textarea" style="flex: 1;" placeholder="What's happening? Share ideas or updates..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Attach Photography (Optional)</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;" id="presetPhotoOptions">
+              <!-- Preset photos buttons -->
+            </div>
+            <input type="url" id="postCustomMediaInput" class="form-input" style="margin-top: 8px;" placeholder="Or paste external image URL..." />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tags (separated by spaces or commas)</label>
+            <input type="text" id="postTagsInput" class="form-input" placeholder="e.g. photography, architecture, systems" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelCreatePostBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="submitCreatePostBtn">Publish Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal-overlay" id="editProfileModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 0.875rem; font-weight: 700;">Edit Profile</h3>
+        <button id="closeEditProfileModal" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-subtle);">&times;</button>
+      </div>
+      <form id="editProfileForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input type="text" id="editDisplayName" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Biography</label>
+            <textarea id="editBio" rows="3" class="form-textarea"></textarea>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" id="editLocation" class="form-input" placeholder="San Francisco, CA" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Website</label>
+              <input type="url" id="editWebsite" class="form-input" placeholder="https://..." />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelEditProfileBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Follow List Modal (Followers / Following) -->
+  <div class="modal-overlay" id="followListModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 0.875rem; font-weight: 700;" id="followListModalTitle">Followers</h3>
+        <button id="closeFollowListModal" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-subtle);">&times;</button>
+      </div>
+      <div class="modal-body" id="followListModalContent" style="max-height: 360px; overflow-y: auto;">
+        <!-- dynamic list of users -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Create New Account Modal -->
+  <div class="modal-overlay" id="newUserModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 0.875rem; font-weight: 700;">Create New User Account</h3>
+        <button id="closeNewUserModal" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-subtle);">&times;</button>
+      </div>
+      <form id="newUserForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Display Name *</label>
+            <input type="text" id="newDisplayName" class="form-input" placeholder="e.g. Jordan Hayes" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username (without @) *</label>
+            <input type="text" id="newUsername" class="form-input" placeholder="e.g. jordanh" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <textarea id="newBio" rows="2" class="form-textarea" placeholder="What are you interested in?"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="newLocation" class="form-input" placeholder="e.g. Seattle, WA" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelNewUserBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Create Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Database & REST API Inspector Modal -->
+  <div class="modal-overlay" id="dbModal" style="display: none;">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 style="font-size: 0.875rem; font-weight: 700;">Database & Express Architecture</h3>
+        <button id="closeDbModal" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-subtle);">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #f1f5f9; padding: 12px; border-radius: var(--radius-md); font-size: 0.75rem;">
+          <strong>Server Status:</strong> <span style="color: #16a34a; font-weight: 700;">Active & Synced</span><br />
+          <strong>Database:</strong> JSON Storage at <code>/data/db.json</code> (persistent across sessions).
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;">
+          <div style="background: #fff; border: 1px solid var(--border-light); padding: 10px; border-radius: var(--radius-md);">
+            <div style="font-size: 1.1rem; font-weight: 800; font-family: var(--font-mono);" id="dbUsersCount">0</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted);">Users</div>
+          </div>
+          <div style="background: #fff; border: 1px solid var(--border-light); padding: 10px; border-radius: var(--radius-md);">
+            <div style="font-size: 1.1rem; font-weight: 800; font-family: var(--font-mono);" id="dbPostsCount">0</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted);">Posts</div>
+          </div>
+          <div style="background: #fff; border: 1px solid var(--border-light); padding: 10px; border-radius: var(--radius-md);">
+            <div style="font-size: 1.1rem; font-weight: 800; font-family: var(--font-mono);" id="dbCommentsCount">0</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted);">Comments</div>
+          </div>
+          <div style="background: #fff; border: 1px solid var(--border-light); padding: 10px; border-radius: var(--radius-md);">
+            <div style="font-size: 1.1rem; font-weight: 800; font-family: var(--font-mono);" id="dbFollowsCount">0</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted);">Follow Links</div>
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">REST Endpoints:</span>
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; background: #0f172a; color: #e2e8f0; padding: 10px 14px; border-radius: var(--radius-md); margin-top: 6px; line-height: 1.8;">
+            GET /api/users &nbsp;&nbsp;&nbsp;&nbsp;· List profiles<br />
+            GET /api/users/:id · Single profile & posts<br />
+            POST /api/users/:id/follow · Follow / Unfollow<br />
+            GET /api/posts &nbsp;&nbsp;&nbsp;&nbsp;· Feed (all / following)<br />
+            POST /api/posts &nbsp;&nbsp;&nbsp;· Create post<br />
+            POST /api/posts/:id/like · Toggle like<br />
+            POST /api/posts/:id/comments · Threaded comment
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button class="btn-secondary" id="resetDbBtn" style="color: #dc2626;">Reset to Seed Data</button>
+        <button class="btn-primary" id="closeDbModalBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
